@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillSwap Hub</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input, select, button { margin: 5px; padding: 5px; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 5px 0; padding: 5px; border-bottom: 1px solid #ccc; }
+    button.delete { margin-left: 10px; color: red; }
+  </style>
+</head>
+<body>
+
+  <h1>SkillSwap Hub</h1>
+
+  <!-- Add skill form -->
+  <div>
+    <input type="text" id="rollNo" placeholder="Roll No" />
+    <input type="text" id="name" placeholder="Skill Name" />
+    <select id="type">
+      <option value="Teach">Teach</option>
+      <option value="Learn">Learn</option>
+    </select>
+    <button onclick="addSkill()">Add Skill</button>
+  </div>
+
+  <h2>Skills List</h2>
+  <ul id="skillsList"></ul>
+
+  <script>
+    const API = "http://localhost:5000/api/skills";
+
+    // Load skills from backend
+    async function loadSkills() {
+      try {
+        const res = await fetch(API);
+        const skills = await res.json();
+
+        const ul = document.getElementById("skillsList");
+        ul.innerHTML = ""; // clear old list
+
+        skills.forEach(skill => {
+          const li = document.createElement("li");
+          li.textContent = `${skill.rollNo || '-'} | ${skill.name} (${skill.teachOrLearn})`;
+
+          // Delete button
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Delete";
+          delBtn.classList.add("delete");
+          delBtn.onclick = () => deleteSkill(skill._id);
+
+          li.appendChild(delBtn);
+          ul.appendChild(li);
+        });
+      } catch (err) {
+        console.error("Failed to load skills:", err);
+      }
+    }
+
+    // Add skill
+    async function addSkill() {
+      const rollNo = document.getElementById("rollNo").value;
+      const name = document.getElementById("name").value;
+      const teachOrLearn = document.getElementById("type").value;
+
+      if (!name) {
+        alert("Please enter Skill Name");
+        return;
+      }
+
+      try {
+        await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rollNo, name, teachOrLearn })
+        });
+
+        document.getElementById("rollNo").value = "";
+        document.getElementById("name").value = "";
+
+        loadSkills(); // refresh list
+      } catch (err) {
+        console.error("Failed to add skill:", err);
+      }
+    }
+
+    // Delete skill
+    async function deleteSkill(id) {
+      try {
+        await fetch(`${API}/${id}`, { method: "DELETE" });
+        loadSkills(); // refresh list
+      } catch (err) {
+        console.error("Failed to delete skill:", err);
+      }
+    }
+
+    // Load skills when page loads
+    window.onload = loadSkills;
+  </script>
+</body>
+</html>
