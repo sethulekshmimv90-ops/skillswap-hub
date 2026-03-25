@@ -1,104 +1,512 @@
-<!DOCTYPE html>
+
+ <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SkillSwap Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    input, select, button { margin: 5px; padding: 5px; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 5px 0; padding: 5px; border-bottom: 1px solid #ccc; }
-    button.delete { margin-left: 10px; color: red; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    :root {
+      --blue-900: #042C53;
+      --blue-800: #0C447C;
+      --blue-600: #185FA5;
+      --blue-400: #378ADD;
+      --blue-200: #85B7EB;
+      --blue-100: #B5D4F4;
+      --blue-50:  #E6F1FB;
+      --green-800: #085041;
+      --green-600: #0F6E56;
+      --green-50:  #E1F5EE;
+      --amber-800: #633806;
+      --amber-600: #854F0B;
+      --amber-50:  #FAEEDA;
+      --red-600:   #A32D2D;
+      --gray-100:  #f0f4f8;
+      --gray-200:  #dce4ee;
+      --gray-400:  #8fa3b8;
+      --text-main: #0d1b2a;
+      --text-sub:  #4a6280;
+      --white:     #ffffff;
+      --radius:    10px;
+      --shadow:    0 2px 16px rgba(24, 95, 165, 0.08);
+    }
+ 
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--blue-50);
+      min-height: 100vh;
+      color: var(--text-main);
+    }
+ 
+    /* ── Header ── */
+    header {
+      background: var(--blue-800);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--blue-400);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .logo-text {
+      font-size: 17px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+    .logo-sub {
+      font-size: 11px;
+      color: var(--blue-200);
+      letter-spacing: 0.03em;
+    }
+    .header-stats {
+      display: flex;
+      gap: 20px;
+    }
+    .stat-pill {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 12px;
+      color: var(--blue-100);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stat-pill strong {
+      color: #fff;
+      font-weight: 600;
+    }
+ 
+    /* ── Main container ── */
+    main {
+      max-width: 720px;
+      margin: 36px auto;
+      padding: 0 16px 60px;
+    }
+ 
+    /* ── Add skill card ── */
+    .add-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--gray-200);
+      padding: 24px 28px;
+      margin-bottom: 28px;
+    }
+    .add-card h2 {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--blue-600);
+      margin-bottom: 16px;
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .form-row input,
+    .form-row select {
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: var(--gray-100);
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .form-row input:focus,
+    .form-row select:focus {
+      border-color: var(--blue-400);
+      background: #fff;
+    }
+    .input-roll  { width: 130px; }
+    .input-skill { flex: 1; min-width: 160px; }
+    .input-type  { width: 120px; cursor: pointer; }
+    .btn-add {
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      background: var(--blue-800);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn-add:hover  { background: var(--blue-600); }
+    .btn-add:active { transform: scale(0.97); }
+    .form-error {
+      font-size: 12px;
+      color: var(--red-600);
+      margin-top: 8px;
+      min-height: 16px;
+    }
+ 
+    /* ── List section ── */
+    .list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .list-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .count-badge {
+      font-size: 12px;
+      background: var(--blue-100);
+      color: var(--blue-800);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+ 
+    /* ── Skill row ── */
+    .skills-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .skill-row {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      animation: fadeIn 0.25s ease;
+      transition: box-shadow 0.2s;
+    }
+    .skill-row:hover {
+      box-shadow: 0 2px 12px rgba(24,95,165,0.1);
+      border-color: var(--blue-100);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--blue-50);
+      border: 1.5px solid var(--blue-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--blue-800);
+      font-family: 'DM Mono', monospace;
+      flex-shrink: 0;
+      letter-spacing: -0.03em;
+    }
+    .skill-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .skill-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .skill-roll {
+      font-size: 12px;
+      color: var(--text-sub);
+      font-family: 'DM Mono', monospace;
+      margin-top: 2px;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
+    }
+    .badge-teach {
+      background: var(--green-50);
+      color: var(--green-800);
+    }
+    .badge-learn {
+      background: var(--amber-50);
+      color: var(--amber-800);
+    }
+    .btn-delete {
+      font-family: 'Sora', sans-serif;
+      font-size: 12px;
+      background: transparent;
+      border: 1px solid var(--gray-200);
+      color: var(--text-sub);
+      border-radius: 7px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+    .btn-delete:hover {
+      background: #fff0f0;
+      color: var(--red-600);
+      border-color: #f7c1c1;
+    }
+ 
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-sub);
+      font-size: 14px;
+      background: var(--white);
+      border: 1px dashed var(--gray-200);
+      border-radius: var(--radius);
+    }
+    .empty-state .empty-icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+      opacity: 0.6;
+    }
+ 
+    /* ── Loading ── */
+    .loading {
+      text-align: center;
+      padding: 32px;
+      color: var(--blue-400);
+      font-size: 14px;
+    }
+ 
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--blue-900);
+      color: #fff;
+      font-size: 13px;
+      padding: 12px 20px;
+      border-radius: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 100;
+    }
+    #toast.show { opacity: 1; }
+ 
+    @media (max-width: 540px) {
+      header { padding: 0 16px; }
+      .header-stats { display: none; }
+      .form-row { flex-direction: column; }
+      .form-row input, .form-row select, .btn-add { width: 100%; }
+      .skill-roll { display: none; }
+    }
   </style>
 </head>
 <body>
-
-  <h1>SkillSwap Hub</h1>
-
-  <!-- Add skill form -->
-  <div>
-    <input type="text" id="rollNo" placeholder="Roll No" />
-    <input type="text" id="name" placeholder="Skill Name" />
-    <select id="type">
-      <option value="Teach">Teach</option>
-      <option value="Learn">Learn</option>
-    </select>
-    <button onclick="addSkill()">Add Skill</button>
-  </div>
-
-  <h2>Skills List</h2>
-  <ul id="skillsList"></ul>
-
+ 
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">⇄</div>
+      <div>
+        <div class="logo-text">SkillSwap Hub</div>
+        <div class="logo-sub">Peer-to-peer learning</div>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="stat-pill">Total <strong id="stat-total">0</strong></div>
+      <div class="stat-pill">Teaching <strong id="stat-teach">0</strong></div>
+      <div class="stat-pill">Learning <strong id="stat-learn">0</strong></div>
+    </div>
+  </header>
+ 
+  <!-- Main -->
+  <main>
+ 
+    <!-- Add skill form -->
+    <div class="add-card">
+      <h2>Post a skill</h2>
+      <div class="form-row">
+        <input class="input-roll"  type="text" id="rollNo"    placeholder="Roll No  e.g. 23BCS101" />
+        <input class="input-skill" type="text" id="skillName" placeholder="Skill name  e.g. Python" />
+        <select class="input-type" id="skillType">
+          <option value="Teach">⬆ Teach</option>
+          <option value="Learn">⬇ Learn</option>
+        </select>
+        <button class="btn-add" onclick="addSkill()">+ Add Skill</button>
+      </div>
+      <div class="form-error" id="formError"></div>
+    </div>
+ 
+    <!-- Skills list -->
+    <div class="list-header">
+      <h2>Skills directory</h2>
+      <span class="count-badge" id="countBadge">0 skills</span>
+    </div>
+    <div class="skills-list" id="skillsList">
+      <div class="loading">Loading skills…</div>
+    </div>
+ 
+  </main>
+ 
+  <!-- Toast notification -->
+  <div id="toast"></div>
+ 
   <script>
     const API = "http://localhost:5000/api/skills";
-
-    // Load skills from backend
+ 
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2500);
+    }
+ 
+    function getInitials(rollNo) {
+      if (!rollNo) return "?";
+      // Show last 3 chars of roll no (e.g. "101") or first 2 letters
+      const digits = rollNo.replace(/\D/g, "");
+      return digits.slice(-3) || rollNo.slice(0, 2).toUpperCase();
+    }
+ 
     async function loadSkills() {
       try {
         const res = await fetch(API);
         const skills = await res.json();
-
-        const ul = document.getElementById("skillsList");
-        ul.innerHTML = ""; // clear old list
-
-        skills.forEach(skill => {
-          const li = document.createElement("li");
-          li.textContent = `${skill.rollNo || '-'} | ${skill.name} (${skill.teachOrLearn})`;
-
-          // Delete button
-          const delBtn = document.createElement("button");
-          delBtn.textContent = "Delete";
-          delBtn.classList.add("delete");
-          delBtn.onclick = () => deleteSkill(skill._id);
-
-          li.appendChild(delBtn);
-          ul.appendChild(li);
-        });
+        renderSkills(skills);
       } catch (err) {
-        console.error("Failed to load skills:", err);
+        document.getElementById("skillsList").innerHTML =
+          `<div class="empty-state"><div class="empty-icon">⚠</div>Cannot connect to backend.<br>Make sure your server is running on port 5000.</div>`;
       }
     }
-
-    // Add skill
-    async function addSkill() {
-      const rollNo = document.getElementById("rollNo").value;
-      const name = document.getElementById("name").value;
-      const teachOrLearn = document.getElementById("type").value;
-
-      if (!name) {
-        alert("Please enter Skill Name");
+ 
+    function renderSkills(skills) {
+      const ul = document.getElementById("skillsList");
+      const countBadge = document.getElementById("countBadge");
+ 
+      // Update stats
+      const teachCount = skills.filter(s => s.teachOrLearn === "Teach").length;
+      const learnCount = skills.filter(s => s.teachOrLearn === "Learn").length;
+      document.getElementById("stat-total").textContent = skills.length;
+      document.getElementById("stat-teach").textContent = teachCount;
+      document.getElementById("stat-learn").textContent = learnCount;
+      countBadge.textContent = skills.length + (skills.length === 1 ? " skill" : " skills");
+ 
+      if (skills.length === 0) {
+        ul.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div>No skills posted yet.<br>Be the first to add one!</div>`;
         return;
       }
-
+ 
+      ul.innerHTML = "";
+      skills.forEach(skill => {
+        const row = document.createElement("div");
+        row.className = "skill-row";
+        row.innerHTML = `
+          <div class="avatar">${getInitials(skill.rollNo)}</div>
+          <div class="skill-info">
+            <div class="skill-name">${escapeHtml(skill.name)}</div>
+            <div class="skill-roll">${escapeHtml(skill.rollNo || "—")}</div>
+          </div>
+          <span class="badge ${skill.teachOrLearn === "Teach" ? "badge-teach" : "badge-learn"}">
+            ${skill.teachOrLearn === "Teach" ? "⬆ Teach" : "⬇ Learn"}
+          </span>
+          <button class="btn-delete" onclick="deleteSkill('${skill._id}', this)">Delete</button>
+        `;
+        ul.appendChild(row);
+      });
+    }
+ 
+    async function addSkill() {
+      const rollNo    = document.getElementById("rollNo").value.trim();
+      const name      = document.getElementById("skillName").value.trim();
+      const teachOrLearn = document.getElementById("skillType").value;
+      const errEl     = document.getElementById("formError");
+ 
+      if (!name) {
+        errEl.textContent = "Please enter a skill name.";
+        document.getElementById("skillName").focus();
+        return;
+      }
+      errEl.textContent = "";
+ 
       try {
         await fetch(API, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ rollNo, name, teachOrLearn })
         });
-
-        document.getElementById("rollNo").value = "";
-        document.getElementById("name").value = "";
-
-        loadSkills(); // refresh list
+        document.getElementById("rollNo").value    = "";
+        document.getElementById("skillName").value = "";
+        showToast("Skill added ✓");
+        loadSkills();
       } catch (err) {
-        console.error("Failed to add skill:", err);
+        errEl.textContent = "Failed to add skill. Is the backend running?";
       }
     }
-
-    // Delete skill
-    async function deleteSkill(id) {
+ 
+    async function deleteSkill(id, btn) {
+      btn.textContent = "…";
+      btn.disabled = true;
       try {
         await fetch(`${API}/${id}`, { method: "DELETE" });
-        loadSkills(); // refresh list
+        showToast("Skill removed.");
+        loadSkills();
       } catch (err) {
-        console.error("Failed to delete skill:", err);
+        btn.textContent = "Delete";
+        btn.disabled = false;
       }
     }
-
-    // Load skills when page loads
-    window.onload = loadSkills;
+ 
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+ 
+    // Allow pressing Enter in skill name input to submit
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("skillName").addEventListener("keydown", e => {
+        if (e.key === "Enter") addSkill();
+      });
+      loadSkills();
+    });
   </script>
 </body>
 </html>
+ 
