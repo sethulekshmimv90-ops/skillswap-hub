@@ -4,20 +4,20 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-app.use(cors()); // allow frontend fetch requests
-app.use(express.json()); // parse JSON
+app.use(cors());
+app.use(express.json());
 
-// MongoDB connection
+// ===== MongoDB Connection =====
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log(err));
 
-// Root route
+// ===== Root =====
 app.get('/', (req, res) => {
   res.send("Backend is running!");
 });
 
-// Schema
+// ===== Schema =====
 const SkillSchema = new mongoose.Schema({
   rollNo: String,
   name: String,
@@ -26,7 +26,7 @@ const SkillSchema = new mongoose.Schema({
 
 const Skill = mongoose.model('Skill', SkillSchema);
 
-// CREATE
+// ===== CREATE =====
 app.post('/api/skills', async (req, res) => {
   try {
     const newSkill = new Skill(req.body);
@@ -37,7 +37,7 @@ app.post('/api/skills', async (req, res) => {
   }
 });
 
-// READ
+// ===== READ ALL =====
 app.get('/api/skills', async (req, res) => {
   try {
     const skills = await Skill.find();
@@ -47,7 +47,17 @@ app.get('/api/skills', async (req, res) => {
   }
 });
 
-// UPDATE
+// ===== 🤖 BOT ROUTE (IMPORTANT) =====
+app.get('/api/skills/roll/:rollNo', async (req, res) => {
+  try {
+    const skills = await Skill.find({ rollNo: req.params.rollNo });
+    res.json(skills);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ===== UPDATE =====
 app.put('/api/skills/:id', async (req, res) => {
   try {
     const updated = await Skill.findByIdAndUpdate(
@@ -61,7 +71,7 @@ app.put('/api/skills/:id', async (req, res) => {
   }
 });
 
-// DELETE
+// ===== DELETE =====
 app.delete('/api/skills/:id', async (req, res) => {
   try {
     await Skill.findByIdAndDelete(req.params.id);
@@ -71,6 +81,6 @@ app.delete('/api/skills/:id', async (req, res) => {
   }
 });
 
-// Server start
+// ===== START SERVER =====
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
